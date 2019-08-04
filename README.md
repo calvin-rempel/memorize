@@ -1,0 +1,2 @@
+# memorize
+Bible Memorization Assistant
