@@ -1,4 +1,9 @@
 #define SCREEN_RESIZE 410
+#define DOWN_KEY 66
+#define UP_KEY 65
+#define ENTER_KEY 10
+#define B_KEY 98
+#define BACKSPACE_KEY 127
 
 #define HORIZ_BORDER_THRESHOLD 17
 #define HORIZ_ABBRV_THRESHOLD 46

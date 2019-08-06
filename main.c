@@ -6,6 +6,7 @@
 #include "errors.h"
 #include "verse.h"
 #include "ui.h"
+#include "loadPassage.h"
 
 int main(int argc, char *argv){
   verse *currentVerse;
