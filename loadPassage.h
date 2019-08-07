@@ -1,16 +1,12 @@
 #ifndef LOADPASSAGE_H
 #define LOADPASSAGE_H
-#define MAX_FILENAME_LENGTH 12
-#define MAX_BOOKNAME_LENGTH 25
-#define BOOKS_IN_BIBLE 66
-#define MAX_CHAPTERS 150
 
-struct bookListItem{
-  char bookName[MAX_BOOKNAME_LENGTH];
+struct listItem{
+  char itemName[MAX_ITEMNAME_LENGTH];
   char fileName[MAX_FILENAME_LENGTH];
 };
 
-typedef struct bookListItem bookListItem;
+typedef struct listItem listItem;
 
 struct chapterItem{
   char fileName[MAX_FILENAME_LENGTH];
@@ -18,28 +14,31 @@ struct chapterItem{
 
 typedef struct chapterItem chapterItem;
 
-bool loadBookList(bookListItem * bookList){
+bool loadItemList(char* listFileName, listItem * itemList){
   bool returnValue = TRUE;
   FILE * fp;
   char input[255];
   char fileName[MAX_FILENAME_LENGTH];
-  char bookName[MAX_BOOKNAME_LENGTH];
-  int bookCount;
+  char itemName[MAX_ITEMNAME_LENGTH];
+  int itemCount;
   int i;
   int j;
 
-  fp = fopen("./bibleFiles/index.list", "r");
+  char directoryName[64] = "./bibleFiles/";
+
+
+  fp = fopen(strcat(directoryName, listFileName), "r");
   if(fp != NULL){
-    for(bookCount = 0; !feof(fp) && bookCount < BOOKS_IN_BIBLE; ++bookCount){
-      //bookList[bookCount] = malloc(sizeof(bookListItem));
+    for(itemCount = 0; !feof(fp); ++itemCount){
+      //bookList[bookCount] = malloc(sizeof(listItem));
       if(fgets(input, 254, fp)){
         //Get Filename
         for(i = 0; i < strlen(input) && i < MAX_FILENAME_LENGTH; ++i){
           if(input[i] == ','){
-            bookList[bookCount].fileName[i] = '\0';
+            itemList[itemCount].fileName[i] = '\0';
             break;
           } else {
-            bookList[bookCount].fileName[i] = input[i];
+            itemList[itemCount].fileName[i] = input[i];
           }
         }
 
@@ -53,24 +52,24 @@ bool loadBookList(bookListItem * bookList){
         //Move onto next letter after above error check.
         ++i;
 
-        //Get Bookname
+        //Get itemName
         if(returnValue){
-          for(j = 0; (i + j) < strlen(input) && j < MAX_BOOKNAME_LENGTH; ++j){
+          for(j = 0; (i + j) < strlen(input) && j < MAX_ITEMNAME_LENGTH; ++j){
             if(input[i + j] == '\n' || input[i + j] == '\r' || feof(fp)){
-              bookList[bookCount].bookName[j] = '\0';
+              itemList[itemCount].itemName[j] = '\0';
               break;
             } else {
-              bookList[bookCount].bookName[j] = input[i + j];
+              itemList[itemCount].itemName[j] = input[i + j];
             }
           }
         }
 
 
         /*ERROR*/
-        if(j > MAX_BOOKNAME_LENGTH){
+        if(j > MAX_ITEMNAME_LENGTH){
           //ERROR!
-          printError("Book Name Error:",
-                     "Max Bookname Length Exceeded in index.list");
+          printError("Item Name Error:",
+                     "Max itemName Length Exceeded in index.list");
           returnValue = FALSE;
         }
       }
@@ -79,14 +78,14 @@ bool loadBookList(bookListItem * bookList){
     fclose(fp);
 
   } else {
-    printError("Load Error", "Unable to open index.list");
+    printError("Load Error", "Unable to open list file");
     returnValue = FALSE;
   }
 
   return returnValue;
 } /*=== End of function loadBookList() =======================================*/
 
-void drawBookList(bookListItem * bookList, int selectedBook){
+void drawItemList(listItem * itemList, int selectedItem, int arrayLength){
   int horizCenter;
   int vertiCenter;
   int i;
@@ -105,13 +104,13 @@ void drawBookList(bookListItem * bookList, int selectedBook){
   mvprintw(0, COLS - strlen(goBack), "%s", goBack);
 
   //print backwards started at selected book
-  for(i = selectedBook; y >= 0 && i >= 0; --i){
-    if(bookList[i].bookName[0] != '\0' || bookList[i].fileName[0] != '\0'){
-      x = vertiCenter - ( strlen(bookList[i].bookName) / 2 );
+  for(i = selectedItem; y >= 0 && i >= 0; --i){
+    if(itemList[i].itemName[0] != '\0' || itemList[i].fileName[0] != '\0'){
+      x = vertiCenter - ( strlen(itemList[i].itemName) / 2 );
       if(y == horizCenter){
         attron(A_STANDOUT);
       }
-      mvprintw(y, x, "%s", bookList[i].bookName);
+      mvprintw(y, x, "%s", itemList[i].itemName);
       if(y == horizCenter){
         attroff(A_STANDOUT);
       }
@@ -121,11 +120,11 @@ void drawBookList(bookListItem * bookList, int selectedBook){
 
   //print forwards starting after selected book
   y = horizCenter + 1;
-  for(i = selectedBook + 1; y < COLS && i < BOOKS_IN_BIBLE; ++i){
+  for(i = selectedItem + 1; y < COLS && i < arrayLength; ++i){
 
-    if(bookList[i].bookName[0] != '\0' || bookList[i].fileName[0] != '\0'){
-      x = vertiCenter - ( strlen(bookList[i].bookName) / 2 );
-      mvprintw(y, x, "%s", bookList[i].bookName);
+    if(itemList[i].itemName[0] != '\0' || itemList[i].fileName[0] != '\0'){
+      x = vertiCenter - ( strlen(itemList[i].itemName) / 2 );
+      mvprintw(y, x, "%s", itemList[i].itemName);
 
       ++y;
     }
@@ -134,85 +133,101 @@ void drawBookList(bookListItem * bookList, int selectedBook){
 }/*=== End function drawList() ===============================================*/
 
 /*=== Begin Function selectBook() ============================================*/
-int selectBook(bookListItem * bookList){
+int selectItem(listItem * itemList, int arrayLength, int selectedItem){
   int input;
-  int selectedBook = 0;
-  int oldSelectedBook = 0;
+  int oldSelectedItem = 0;
 
   //Get User Input
   while(1){
     input = getch();
 
     if(input == UP_KEY){
-      if(selectedBook - 1 >= 0){
-        --selectedBook;
-        drawList(bookList, selectedBook);
+      if(selectedItem - 1 >= 0){
+        --selectedItem;
+        drawItemList(itemList, selectedItem, arrayLength);
       }
     } else if(input == DOWN_KEY){
-      if(selectedBook + 1 < BOOKS_IN_BIBLE){
-        oldSelectedBook = selectedBook;
-        ++selectedBook;
+      if(selectedItem + 1 < arrayLength){
+        oldSelectedItem = selectedItem;
+        ++selectedItem;
         //attempt to go to next book if current one is invalid
-        while(bookList[selectedBook].bookName[0] == '\0' &&
-              selectedBook + 1 < BOOKS_IN_BIBLE){
-              ++selectedBook;
+        while(itemList[selectedItem].itemName[0] == '\0' &&
+              selectedItem + 1 < arrayLength){
+              ++selectedItem;
         }
         //if the last book we landed on was invalid, return to the original
         //valid book
-        if(bookList[selectedBook].bookName[0] == '\0'){
-          selectedBook = oldSelectedBook;
+        if(itemList[selectedItem].itemName[0] == '\0'){
+          selectedItem = oldSelectedItem;
         } else {
-          drawList(bookList, selectedBook);
+          drawItemList(itemList, selectedItem, arrayLength);
         }
       }
     } else if(input == ENTER_KEY){
       break;
     } else if(input == BACKSPACE_KEY || input == B_KEY){
-      selectedBook = -1; //indicate no book was selected
+      selectedItem = -1; //indicate no item was selected
       break;
     }
   }
 
-  return selectedBook;
+  return selectedItem;
 }/*=== End Function selectBook() =============================================*/
 
 
-/*=== Begin Function loadChapterList =========================================*/
-bool loadChapterList(char * fileName, chapterItem * list){
+bool selectPassage(char * fileName){
   bool returnValue = TRUE;
-  FILE * fp = NULL;
-  char fullPath[26] = "./bibleFiles/\0";
-  char input[255];
-  int numChaps;
+  listItem bookList[BOOKS_IN_BIBLE] = {};
+  listItem chapterList[MAX_CHAPTERS] = {};
+  int selectedBook = 0;
+  int selectedChapter = 0;
+  int i;
 
-  strcat(fullPath, fileName);
-  fp = fopen(fullPath, "r");
-  if(fp != NULL){
-    fgets(input, 254, fp); //throw away first line - it is the book title.
+  //Load Book List
+  if(loadItemList("index.list", bookList)){
+    while(1){
+      drawItemList(bookList, selectedBook, BOOKS_IN_BIBLE);
+      selectedBook = selectItem(bookList, BOOKS_IN_BIBLE, selectedBook);
 
-    for(numChaps = 0; !feof(fp) && numChaps <= MAX_CHAPTERS; ++numChaps){
-      fgets(input, 254, fp);
-      if(!feof(fp)){
-        if(strlen(input) >= MAX_FILENAME_LENGTH){
-          printError("FileName Length Error", "Filename in Chapter List Too Long");
+      if(selectedBook < 0){
+          //quit subroutine and return to main program
+          fileName[0] = '\0';
+          break;
+      } else {
+        //Book has been selected
+
+        if(loadItemList(bookList[selectedBook].fileName, chapterList)){
+          drawItemList(chapterList, selectedChapter, MAX_CHAPTERS);
+          selectedChapter = selectItem(chapterList, MAX_CHAPTERS,
+                                       selectedChapter);
+
+          if(selectedChapter >= 0){
+            //Chapter has been selected. set the filename so the verse
+            //loader routine can get that and load the appropriate verse.
+            strcpy(fileName, chapterList[selectedChapter].fileName);
+            break;
+          } else {
+            //did not select a chapter but went back to book selection
+            selectedChapter = 0; //reset for the next go-around
+          }
+
+        } else {
+          //ERROR Loading Chapter List
+          printError("Chapter List Loading Error",
+                     "Unable to load chapter list");
           returnValue = FALSE;
           break;
         }
-
-        //get rid of newline characters
-        if(input[strlen(input) - 1] == '\r' || input[strlen(input) - 1] == '\n'){
-          input[strlen(input) - 1] = '\0';
-        }
-        strcpy(list[numChaps].fileName, input);
       }
+
     }
-    fclose(fp);
   } else {
-    printError("File Open Error", "Unable to Open chapterfile");
+    //Error Loading Book List.
+    printError("Book List Loading Error", "Unable to load book list");
     returnValue = FALSE;
   }
 
-  return returnValue;
-}/*=== End of function loadChapterList() =====================================*/
 
+  return returnValue;
+}
 #endif

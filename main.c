@@ -16,6 +16,7 @@ int main(int argc, char *argv){
   int verse = 1;
   int mask = 0;
   bool hideText = FALSE;
+  char fileName[MAX_FILENAME_LENGTH];
 
   static int upperCtrlHeight = 5;
   static int fullTextCtrlHeight = 2;
@@ -51,7 +52,13 @@ int main(int argc, char *argv){
   refresh();
 
   //LOAD FILES
-  loadPassage("passage.txt", currentVerse, book, &chapter);
+  if(!loadSavedVerse(fileName)){
+    getch();
+    endwin();
+    return -1;
+  }
+
+  loadPassage(fileName, currentVerse, book, &chapter);
 
   //Do the initial round of drawing windows
   drawUpperCtrl(upperCtrl, TRUE, book, chapter, verse);
@@ -111,6 +118,23 @@ int main(int argc, char *argv){
       }
     } else if(input == (int)'l' || input == (int)'L'){
       //Load Passage
+      if(selectPassage(fileName)){
+        rewindVerse(currentVerse, &currentVerse);
+        destroyVerse(currentVerse);
+        currentVerse = malloc(sizeof(verse));
+        loadPassage(fileName, currentVerse, book, &chapter);
+        verse = 1;
+        drawUpperCtrl(upperCtrl, TRUE, book, chapter, verse);
+        drawFullTextCtrl(fullTextCtrl, TRUE, hideText);
+        drawAbrvTextCtrl(abrvTextCtrl, TRUE, mask);
+        printVerse(fullText, currentVerse, FALSE, 0);
+        printVerse(abrvText, currentVerse, TRUE, mask);
+        saveVerse(fileName);
+      } else {
+        printError("File Load Error", "File Loading error in loadPassage()");
+        getch();
+        break;
+      }
     } else if(input == (int)'=' || input == (int)'+'){
       //increase mask
       if(mask + 1 > 0){
