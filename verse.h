@@ -1,5 +1,7 @@
 #ifndef VERSE_H
 #define VERSE_H
+const char * DEFAULT_PASSAGE_FILE = "002_GEN_01";
+
 struct verse {
   char *sText;
   int sLength;
@@ -198,14 +200,16 @@ bool addVerse(verse * oldVerse, verse ** versePointer){
 void destroyVerse(verse * sourceVerse){
   //recursively go to the end of the linked list and free up all of the memory
   //allocated for the verses and strings, then work our way backwards.
-  if(sourceVerse->vNext){
+  if(sourceVerse->vNext != NULL){
     destroyVerse(sourceVerse->vNext);
-    free(sourceVerse->vNext);
+    //free(sourceVerse->vNext);
   }
 
   free(sourceVerse->sText);
-  sourceVerse->sMaxLength = 0;
-  sourceVerse->sLength = 0;
+  free(sourceVerse);
+  sourceVerse = NULL;
+  //sourceVerse->sMaxLength = 0;
+  //sourceVerse->sLength = 0;
 
   return;
 }/*===End function destroyVerse() ===========================================*/
@@ -382,27 +386,74 @@ bool loadPassage(char * fileName, verse *currentVerse, char* book, int * chapter
   FILE * fp;
   char temp[5];
   bool returnValue = true;
-  fp = fopen(fileName,"r");
+  char directoryName[64] = "./bibleFiles/";
+  fp = fopen(strcat(directoryName,fileName),"r");
 
-  //if no file, display error and quit.
-  initVerse(currentVerse, 1);
-  fgets(book, 24, fp);
-  book[strlen(book) - 1] = '\0'; //eliminate the newline character.
-  fgets(temp, 4, fp);
-  *chapter = atoi(temp);
+  if(fp != NULL){
+    //if no file, display error and quit.
+    initVerse(currentVerse, 1);
+    fgets(book, 24, fp);
+    book[strlen(book) - 1] = '\0'; //eliminate the newline character.
+    fgets(temp, 4, fp);
+    *chapter = atoi(temp);
 
-  loadVerse(currentVerse, fp);
-  //printVerse(currentVerse, TRUE);
-
-  while(!feof(fp)){
-    addVerse(currentVerse, &currentVerse);
     loadVerse(currentVerse, fp);
-    //printVerse(currentVerse, FALSE);
     //printVerse(currentVerse, TRUE);
+
+    while(!feof(fp)){
+      addVerse(currentVerse, &currentVerse);
+      loadVerse(currentVerse, fp);
+      //printVerse(currentVerse, FALSE);
+      //printVerse(currentVerse, TRUE);
+    }
+
+    fclose(fp);
+    rewindVerse(currentVerse, &currentVerse);
+
+  } else {
+    returnValue = FALSE;
+    printError("File Load Error","Unable to load passage file in ./bibleFiles");
   }
 
-  fclose(fp);
-  rewindVerse(currentVerse, &currentVerse);
+  return returnValue;
+}
+
+bool saveVerse(char * fileName){
+  bool returnValue = TRUE;
+  FILE * fp = fopen("./bibleFiles/savedVerse", "w+");
+    if(fp != NULL){
+      fprintf(fp, "%s", fileName);
+      fclose(fp);
+    } else {
+      returnValue = FALSE;
+  }
+
+
+  return returnValue;
+}
+
+bool loadSavedVerse(char * fileName){
+  bool returnValue = TRUE;
+  char temp[MAX_FILENAME_LENGTH] = "";
+
+  FILE * fp = fopen("./bibleFiles/savedVerse", "r");
+  if(fp != NULL){
+    fgets(temp, MAX_FILENAME_LENGTH, fp);
+    strcpy(fileName, temp);
+    fclose(fp);
+  } else {
+    fp = fopen("./bibleFiles/savedVerse", "w+");
+    if(fp != NULL){
+      fprintf(fp, "%s", DEFAULT_PASSAGE_FILE);
+      fclose(fp);
+      strcpy(fileName, DEFAULT_PASSAGE_FILE);
+    } else {
+      printError("File Error:",
+                 "Unable to open ./bibleFiles/savedVerse for read or write");
+      returnValue = FALSE;
+    }
+
+  }
 
   return returnValue;
 }
