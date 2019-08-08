@@ -177,7 +177,7 @@ bool addVerse(verse * oldVerse, verse ** versePointer){
   verse *newVerse = NULL;
 
   //allocate memory for new verse
-  newVerse = (verse*)malloc(sizeof(verse));
+  newVerse = (verse*)malloc(sizeof(struct verse));
 
   if(newVerse){
     initVerse(newVerse, oldVerse->vNum + 1);
@@ -350,34 +350,29 @@ void rewindVerse(verse *sourceVerse, verse **versePointer){
 
 /*=== Begin Function loadVerse() =============================================*/
 bool loadVerse(verse *sourceVerse, FILE *fp){
-  char temp[33];
+  char temp[33] = {};
   char lastChar;
   bool repeat;
   bool returnValue = TRUE;
 
-  if(temp){
-    do{
-      repeat = TRUE;
-      fgets(temp, 32, fp);
+  do{
+    repeat = TRUE;
+    fgets(temp, 32, fp);
 
-      //shove into the string & !!! Begin Error Check !!!
-      if(!appendString(temp, sourceVerse)){
-        printError("appendString Error", "Error in main loop of loadVerse()");
-        returnValue = FALSE;
-        break;
-      }//!!! End Error Check !!!
+    //shove into the string & !!! Begin Error Check !!!
+    if(!appendString(temp, sourceVerse)){
+      printError("appendString Error", "Error in main loop of loadVerse()");
+      returnValue = FALSE;
+      break;
+    }//!!! End Error Check !!!
 
-      //check to see if we got the entire verse
-      lastChar = temp[strlen(temp) - 1];
-      if(lastChar == '\n' || lastChar == '\r' || feof(fp)){
-        repeat = FALSE;
-      }
+    //check to see if we got the entire verse
+    lastChar = temp[strlen(temp) - 1];
+    if(lastChar == '\n' || lastChar == '\r' || feof(fp)){
+      repeat = FALSE;
+    }
 
-    } while(repeat);
-  } else {
-    returnValue = FALSE;
-    memAllocError("loadVerse() - 1st malloc");
-  }
+  } while(repeat);
 
   return returnValue;
 }/*=== End Function loadVerse() ==============================================*/

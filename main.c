@@ -8,7 +8,7 @@
 #include "ui.h"
 #include "loadPassage.h"
 
-int main(int argc, char *argv){
+int main(){
   verse *currentVerse;
   int input;
   char book[25];
@@ -25,8 +25,8 @@ int main(int argc, char *argv){
   int abrvTextHeight;
 
   //load passage file
-  int i = 0;
-  currentVerse = malloc(sizeof(verse));
+  currentVerse = malloc(sizeof(struct verse));
+
 
   initscr();
   cbreak();
@@ -117,11 +117,12 @@ int main(int argc, char *argv){
         drawUpperCtrl(upperCtrl, FALSE, book, chapter, verse);
       }
     } else if(input == (int)'l' || input == (int)'L'){
+
       //Load Passage
       if(selectPassage(fileName)){
         rewindVerse(currentVerse, &currentVerse);
         destroyVerse(currentVerse);
-        currentVerse = malloc(sizeof(verse));
+        currentVerse = malloc(sizeof(struct verse));
         loadPassage(fileName, currentVerse, book, &chapter);
         verse = 1;
         drawUpperCtrl(upperCtrl, TRUE, book, chapter, verse);
@@ -135,6 +136,7 @@ int main(int argc, char *argv){
         getch();
         break;
       }
+
     } else if(input == (int)'=' || input == (int)'+'){
       //increase mask
       if(mask + 1 > 0){

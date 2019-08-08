@@ -18,8 +18,8 @@ bool loadItemList(char* listFileName, listItem * itemList){
   bool returnValue = TRUE;
   FILE * fp;
   char input[255];
-  char fileName[MAX_FILENAME_LENGTH];
-  char itemName[MAX_ITEMNAME_LENGTH];
+  //char fileName[MAX_FILENAME_LENGTH];
+  //char itemName[MAX_ITEMNAME_LENGTH];
   int itemCount;
   int i;
   int j;
@@ -181,7 +181,6 @@ bool selectPassage(char * fileName){
   listItem chapterList[MAX_CHAPTERS] = {};
   int selectedBook = 0;
   int selectedChapter = 0;
-  int i;
 
   //Load Book List
   if(loadItemList("index.list", bookList)){
