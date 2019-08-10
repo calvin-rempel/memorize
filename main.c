@@ -120,6 +120,8 @@ int main(){
           saveVerse(fileName);
         }
         //redraw screen
+        wipeScreen();
+        refresh();
         drawUpperCtrl(upperCtrl, TRUE, book, chapter, verse);
         drawFullTextCtrl(fullTextCtrl, TRUE, hideText);
         drawAbrvTextCtrl(abrvTextCtrl, TRUE, mask);
