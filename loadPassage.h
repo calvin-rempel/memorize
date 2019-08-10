@@ -14,21 +14,30 @@ struct chapterItem{
 
 typedef struct chapterItem chapterItem;
 
-bool loadItemList(char* listFileName, listItem * itemList){
+bool loadItemList(char* listFileName, listItem * itemList, char* title){
   bool returnValue = TRUE;
   FILE * fp;
   char input[255];
   int itemCount;
   int i;
   int j;
+  bool gotTitle = FALSE;
 
   char directoryName[64] = "./bibleFiles/";
 
   fp = fopen(strcat(directoryName, listFileName), "r");
   if(fp != NULL){
-    for(itemCount = 0; !feof(fp); ++itemCount){
+    //ITEM COUNT -1 as first line in file should always be the title and not an
+    //item itself.
+    for(itemCount = -1; !feof(fp); ++itemCount){
       if(fgets(input, 254, fp)){
         //Get Filename
+        if(!gotTitle){
+          strcpy(title, input);
+          gotTitle = TRUE;
+          continue;
+        }
+
         for(i = 0; i < strlen(input) && i < MAX_FILENAME_LENGTH; ++i){
           if(input[i] == ','){
             itemList[itemCount].fileName[i] = '\0';
@@ -37,7 +46,6 @@ bool loadItemList(char* listFileName, listItem * itemList){
             itemList[itemCount].fileName[i] = input[i];
           }
         }
-
         /*ERROR*/
         if(i > MAX_FILENAME_LENGTH){
           //ERROR!
@@ -80,7 +88,8 @@ bool loadItemList(char* listFileName, listItem * itemList){
   return returnValue;
 } /*=== End of function loadBookList() =======================================*/
 
-void drawItemList(listItem * itemList, int selectedItem, int arrayLength){
+void drawItemList(listItem * itemList, int selectedItem, int arrayLength,
+                  char * title){
   int horizCenter;
   int vertiCenter;
   int i;
@@ -95,11 +104,14 @@ void drawItemList(listItem * itemList, int selectedItem, int arrayLength){
   vertiCenter = COLS / 2;
   y = horizCenter;
 
+  //draw title
+  mvprintw(0, (COLS - strlen(title)) / 2, "%s", title);
+
   //draw control item
   mvprintw(0, COLS - strlen(goBack), "%s", goBack);
 
   //print backwards started at selected book
-  for(i = selectedItem; y >= 0 && i >= 0; --i){
+  for(i = selectedItem; y >= 1 && i >= 0; --i){
     if(itemList[i].itemName[0] != '\0' || itemList[i].fileName[0] != '\0'){
       x = vertiCenter - ( strlen(itemList[i].itemName) / 2 );
       if(y == horizCenter){
@@ -128,7 +140,8 @@ void drawItemList(listItem * itemList, int selectedItem, int arrayLength){
 }/*=== End function drawList() ===============================================*/
 
 /*=== Begin Function selectBook() ============================================*/
-int selectItem(listItem * itemList, int arrayLength, int selectedItem){
+int selectItem(listItem * itemList, int arrayLength, int selectedItem,
+               char * title){
   int input;
   int oldSelectedItem = 0;
 
@@ -139,7 +152,7 @@ int selectItem(listItem * itemList, int arrayLength, int selectedItem){
     if(input == UP_KEY){
       if(selectedItem - 1 >= 0){
         --selectedItem;
-        drawItemList(itemList, selectedItem, arrayLength);
+        drawItemList(itemList, selectedItem, arrayLength, title);
       }
     } else if(input == DOWN_KEY){
       if(selectedItem + 1 < arrayLength){
@@ -155,7 +168,7 @@ int selectItem(listItem * itemList, int arrayLength, int selectedItem){
         if(itemList[selectedItem].itemName[0] == '\0'){
           selectedItem = oldSelectedItem;
         } else {
-          drawItemList(itemList, selectedItem, arrayLength);
+          drawItemList(itemList, selectedItem, arrayLength, title);
         }
       }
     } else if(input == ENTER_KEY){
@@ -176,12 +189,13 @@ bool selectPassage(char * fileName){
   listItem chapterList[MAX_CHAPTERS] = {};
   int selectedBook = 0;
   int selectedChapter = 0;
+  char title[64] = {};
 
   //Load Book List
-  if(loadItemList("index.list", bookList)){
+  if(loadItemList("index.list", bookList, title)){
     while(1){
-      drawItemList(bookList, selectedBook, BOOKS_IN_BIBLE);
-      selectedBook = selectItem(bookList, BOOKS_IN_BIBLE, selectedBook);
+      drawItemList(bookList, selectedBook, BOOKS_IN_BIBLE, title);
+      selectedBook = selectItem(bookList, BOOKS_IN_BIBLE, selectedBook, title);
 
       if(selectedBook < 0){
           //quit subroutine and return to main program
@@ -189,10 +203,10 @@ bool selectPassage(char * fileName){
       } else {
         //Book has been selected
 
-        if(loadItemList(bookList[selectedBook].fileName, chapterList)){
-          drawItemList(chapterList, selectedChapter, MAX_CHAPTERS);
+        if(loadItemList(bookList[selectedBook].fileName, chapterList, title)){
+          drawItemList(chapterList, selectedChapter, MAX_CHAPTERS, title);
           selectedChapter = selectItem(chapterList, MAX_CHAPTERS,
-                                       selectedChapter);
+                                       selectedChapter, title);
 
           if(selectedChapter >= 0){
             //Chapter has been selected. set the filename so the verse
