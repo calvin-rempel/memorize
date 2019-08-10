@@ -396,6 +396,14 @@ bool loadPassage(char * fileName, verse *currentVerse, char* book, int * chapter
     //printVerse(currentVerse, TRUE);
 
     while(!feof(fp)){
+      //check to see if we are about to hit the end of file
+      fgetc(fp);
+      if(feof(fp)){
+        break;
+      }
+      fseek(fp, -1, SEEK_CUR);
+
+      
       addVerse(currentVerse, &currentVerse);
       loadVerse(currentVerse, fp);
       //printVerse(currentVerse, FALSE);
