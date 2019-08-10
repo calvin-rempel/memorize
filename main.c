@@ -96,13 +96,16 @@ int main(){
     } else if(input == (int)'.' || input == (int)'>'){
       //Next Verse
       if(verse + 1 > 0){ //check for overflow
-        ++verse;
-        nextVerse(currentVerse, &currentVerse);
-        if(!hideText){
-          printVerse(fullText, currentVerse, FALSE, 0);
+        //Attempt to move to next verse
+        if(nextVerse(currentVerse, &currentVerse)){
+          ++verse;
+          if(!hideText){
+            printVerse(fullText, currentVerse, FALSE, 0);
+          }
+          printVerse(abrvText, currentVerse, TRUE, mask);
+          drawUpperCtrl(upperCtrl, FALSE, book, chapter, verse);
         }
-        printVerse(abrvText, currentVerse, TRUE, mask);
-        drawUpperCtrl(upperCtrl, FALSE, book, chapter, verse);
+
       }
     } else if(input == (int)'p' || input == (int)'P'){
       //Previous Chapter

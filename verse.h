@@ -316,7 +316,7 @@ void printVerse(WINDOW * win, verse *sourceVerse, bool firstLetter, int mask){
 bool nextVerse(verse *sourceVerse, verse **versePointer){
  bool returnValue = TRUE;
 
- if(sourceVerse->vNext){
+ if(sourceVerse->vNext != NULL){
    *versePointer = sourceVerse->vNext;
  } else {
    returnValue = FALSE;
