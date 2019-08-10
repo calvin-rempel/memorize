@@ -144,7 +144,16 @@ void wipeScreen(){
 
   return;
 }
-
+/**
+Function: wipeLine
+Purpose: To erase the contents of a line on the screen.
+Preconditions: Must be in ncurses mode.
+Postconditions: None.
+Side Effects: Specified line of screen will be blanked out.
+Inputs: int y - the line number to be wiped.
+Outputs: None.
+ **/
+void wipeLine(int y);
 
 /*=== Begin Function drawAbrvTextCtrl() ======================================*/
 void drawAbrvTextCtrl(WINDOW * win, bool redraw, int mask){
@@ -271,12 +280,24 @@ void drawUpperCtrl(WINDOW * upperCtrl, bool redraw, char * book, int chapter,
   }
 
   //Book Chapter Verse indicator
+  wipeLine(3);
   wattroff(upperCtrl, A_BOLD);
-  mvwprintw(upperCtrl, 3, 0, "%s %3d:%3d", book, chapter, verse);
+  mvwprintw(upperCtrl, 3, 0, "%s %d:%d", book, chapter, verse);
 
   wrefresh(upperCtrl);
   return;
 }/*=== End Function drawUpperCtrl() ==========================================*/
+
+/*=== Begin Function wipeLine() ==============================================*/
+void wipeLine(int y){
+  int x;
+  mvprintw(y, 0, "");
+  for(x = 0; x < COLS; ++x){
+    printw(" ");
+  }
+  refresh();
+  return;
+}/*=== End Function wipeLine() ===============================================*/
 
 /*=== Begin Function textBoxSizer() ==========================================*/
 void textBoxSizer(int upperCtrlHeight, int fullTextCtrlHeight,
