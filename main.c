@@ -157,6 +157,9 @@ int main(){
       }
 
       drawFullTextCtrl(fullTextCtrl, FALSE, hideText);
+    } else if(input == (int)'q' || input == (int)'Q'){
+      //quit program
+      break;
     }
 
   }
