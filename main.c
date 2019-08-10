@@ -84,14 +84,14 @@ int main(){
     } else if(input == (int)',' || input == (int)'<'){
       //Previous Verse
       if(verse > 1){
-        --verse;
-        prevVerse(currentVerse, &currentVerse);
-        if(!hideText){
-          printVerse(fullText, currentVerse, FALSE, 0);
+        if(prevVerse(currentVerse, &currentVerse)){
+          --verse;
+          if(!hideText){
+            printVerse(fullText, currentVerse, FALSE, 0);
+          }
+          printVerse(abrvText, currentVerse, TRUE, mask);
+          drawUpperCtrl(upperCtrl, FALSE, book, chapter, verse);
         }
-        printVerse(abrvText, currentVerse, TRUE, mask);
-        drawUpperCtrl(upperCtrl, FALSE, book, chapter, verse);
-
       }
     } else if(input == (int)'.' || input == (int)'>'){
       //Next Verse
