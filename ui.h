@@ -232,8 +232,6 @@ void drawUpperCtrl(WINDOW * upperCtrl, bool redraw, char * book, int chapter,
   static char* pVerseLong = "(<)Previous Verse";
   static char* nVerseShort = "Next V.(>)";
   static char* nVerseLong = "Next Verse(>)";
-  static char* pChapter = "<<(P)rev Chapter";
-  static char* nChapter = "(N)ext Chapter>>";
   static char* lPassage = "(L)oad Passage";
   char* pVerse; //previous verse
   char* nVerse; //next verse
@@ -273,10 +271,6 @@ void drawUpperCtrl(WINDOW * upperCtrl, bool redraw, char * book, int chapter,
     mvwprintw(upperCtrl, 1, 0, "%s", pVerse);
     mvwprintw(upperCtrl, 1, COLS / 2 - strlen(lPassage) / 2, "%s", lPassage);
     mvwprintw(upperCtrl, 1, (COLS - strlen(nVerse)), "%s", nVerse);
-
-    //Second Line of Controls
-    mvwprintw(upperCtrl, 2, 0, "%s", pChapter);
-    mvwprintw(upperCtrl, 2, (COLS - strlen(nChapter)), "%s", nChapter);
   }
 
   //Book Chapter Verse indicator

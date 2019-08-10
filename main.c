@@ -107,18 +107,6 @@ int main(){
         }
 
       }
-    } else if(input == (int)'p' || input == (int)'P'){
-      //Previous Chapter
-      if(chapter > 1){
-        --chapter;
-        drawUpperCtrl(upperCtrl, FALSE, book, chapter, verse);
-      }
-    } else if(input == (int)'n' || input == (int)'N'){
-      //Next Chapter
-      if(chapter + 1 > 0){
-        ++chapter;
-        drawUpperCtrl(upperCtrl, FALSE, book, chapter, verse);
-      }
     } else if(input == (int)'l' || input == (int)'L'){
 
       //Load Passage
