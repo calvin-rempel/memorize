@@ -16,7 +16,7 @@ int main(){
   int verse = 1;
   int mask = 0;
   bool hideText = FALSE;
-  char fileName[MAX_FILENAME_LENGTH];
+  char fileName[MAX_FILENAME_LENGTH] = {};
 
   static int upperCtrlHeight = 5;
   static int fullTextCtrlHeight = 2;
@@ -26,7 +26,6 @@ int main(){
 
   //load passage file
   currentVerse = malloc(sizeof(struct verse));
-
 
   initscr();
   cbreak();
@@ -108,26 +107,29 @@ int main(){
 
       }
     } else if(input == (int)'l' || input == (int)'L'){
-
       //Load Passage
+      fileName[0] = '\0';
       if(selectPassage(fileName)){
-        rewindVerse(currentVerse, &currentVerse);
-        destroyVerse(currentVerse);
-        currentVerse = malloc(sizeof(struct verse));
-        loadPassage(fileName, currentVerse, book, &chapter);
-        verse = 1;
+        //If user cancelled loading book, filename will be blank.
+        if(fileName[0] != '\0'){
+          rewindVerse(currentVerse, &currentVerse);
+          destroyVerse(currentVerse);
+          currentVerse = malloc(sizeof(struct verse));
+          loadPassage(fileName, currentVerse, book, &chapter);
+          verse = 1;
+          saveVerse(fileName);
+        }
+        //redraw screen
         drawUpperCtrl(upperCtrl, TRUE, book, chapter, verse);
         drawFullTextCtrl(fullTextCtrl, TRUE, hideText);
         drawAbrvTextCtrl(abrvTextCtrl, TRUE, mask);
         printVerse(fullText, currentVerse, FALSE, 0);
         printVerse(abrvText, currentVerse, TRUE, mask);
-        saveVerse(fileName);
       } else {
         printError("File Load Error", "File Loading error in loadPassage()");
         getch();
         break;
       }
-
     } else if(input == (int)'=' || input == (int)'+'){
       //increase mask
       if(mask + 1 > 0){

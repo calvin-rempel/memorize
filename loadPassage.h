@@ -18,19 +18,15 @@ bool loadItemList(char* listFileName, listItem * itemList){
   bool returnValue = TRUE;
   FILE * fp;
   char input[255];
-  //char fileName[MAX_FILENAME_LENGTH];
-  //char itemName[MAX_ITEMNAME_LENGTH];
   int itemCount;
   int i;
   int j;
 
   char directoryName[64] = "./bibleFiles/";
 
-
   fp = fopen(strcat(directoryName, listFileName), "r");
   if(fp != NULL){
     for(itemCount = 0; !feof(fp); ++itemCount){
-      //bookList[bookCount] = malloc(sizeof(listItem));
       if(fgets(input, 254, fp)){
         //Get Filename
         for(i = 0; i < strlen(input) && i < MAX_FILENAME_LENGTH; ++i){
@@ -63,7 +59,6 @@ bool loadItemList(char* listFileName, listItem * itemList){
             }
           }
         }
-
 
         /*ERROR*/
         if(j > MAX_ITEMNAME_LENGTH){
@@ -190,7 +185,6 @@ bool selectPassage(char * fileName){
 
       if(selectedBook < 0){
           //quit subroutine and return to main program
-          fileName[0] = '\0';
           break;
       } else {
         //Book has been selected
