@@ -389,7 +389,7 @@ bool loadPassage(char * fileName, verse *currentVerse, char* book, int * chapter
     initVerse(currentVerse, 1);
     fgets(book, 24, fp);
     book[strlen(book) - 1] = '\0'; //eliminate the newline character.
-    fgets(temp, 4, fp);
+    fgets(temp, 5, fp);
     *chapter = atoi(temp);
 
     loadVerse(currentVerse, fp);
