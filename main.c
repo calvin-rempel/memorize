@@ -24,6 +24,13 @@ int main(){
   int fullTextHeight;
   int abrvTextHeight;
 
+
+  WINDOW *upperCtrl;
+  WINDOW *fullTextCtrl;
+  WINDOW *abrvTextCtrl;
+  WINDOW *fullText;
+  WINDOW *abrvText;
+
   //load passage file
   currentVerse = malloc(sizeof(struct verse));
 
@@ -34,18 +41,18 @@ int main(){
   curs_set(0);
 
   //Init Windows
-  textBoxSizer(upperCtrlHeight, fullTextCtrlHeight, abrvTextCtrlHeight,
-               &abrvTextHeight, &fullTextHeight);
+  textBoxSizer(upperCtrlHeight, fullTextCtrlHeight, abrvTextCtrlHeight, &abrvTextHeight, &fullTextHeight);
 
-  WINDOW *upperCtrl = newwin(upperCtrlHeight, COLS, 0, 0);
-  WINDOW *fullTextCtrl = newwin(fullTextCtrlHeight, COLS, upperCtrlHeight, 0);
-  WINDOW *abrvTextCtrl = newwin(abrvTextCtrlHeight, COLS, (upperCtrlHeight +
-                                fullTextCtrlHeight + fullTextHeight), 0);
-  WINDOW *fullText = newwin(fullTextHeight, COLS, upperCtrlHeight +
-                            fullTextCtrlHeight, 0);
-  WINDOW *abrvText = newwin(abrvTextHeight, COLS, upperCtrlHeight +
-                            fullTextCtrlHeight + fullTextHeight +
-                            abrvTextCtrlHeight, 0);
+
+  upperCtrl = newwin(upperCtrlHeight, COLS, 0, 0);
+  fullTextCtrl = newwin(fullTextCtrlHeight, COLS, upperCtrlHeight, 0);
+  abrvTextCtrl = newwin(abrvTextCtrlHeight, COLS, (upperCtrlHeight +
+	         fullTextCtrlHeight + fullTextHeight), 0);
+  fullText = newwin(fullTextHeight, COLS, upperCtrlHeight +
+                 fullTextCtrlHeight, 0);
+  abrvText = newwin(abrvTextHeight, COLS, upperCtrlHeight +
+                 fullTextCtrlHeight + fullTextHeight +
+                 abrvTextCtrlHeight, 0);
 
   //wipeScreen();
   refresh();
